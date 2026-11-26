@@ -1,0 +1,153 @@
+# Hackviser – Black Train
+
+## 1. Challenge Information
+
+- **Platform:** Hackviser
+- **Challenge:** Black Train
+- **Category:** Web
+- **Difficulty:** Easy
+- **Date:** 26.11.2026
+- **Status:** Successfully Completed
+
+## 2. Objective
+
+The objective was to investigate a web application, discover hidden resources and internal API endpoints, obtain access to the administrative interface, and complete the required tasks.
+
+## 3. Initial Reconnaissance
+
+Before accessing the target application, I connected to the Hackviser VPN and configured the target domain in the `/etc/hosts` file.
+
+Command:
+
+```bash
+sudo vim /etc/hosts
+```
+
+I added the target IP address and its corresponding domain name to the file.
+
+After configuration, I accessed the web application through the browser:
+
+```text
+http://velnorwick.hv
+```
+
+I inspected the website and explored its available pages and functionality.
+
+## 4. Web Enumeration
+
+To discover hidden directories and endpoints, I used FFUF with a directory wordlist.
+
+Command:
+
+```bash
+ffuf -w /usr/share/wordlists/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-medium.txt -u http://velnorwick.hv/FUZZ
+```
+
+The scan revealed several directories, including:
+
+- `/mail`
+- `/assets`
+- `/img`
+
+I discovered that the `/mail` directory contained a Mailpit interface.
+
+By inspecting the emails, I found internal communications between staff members. One of these emails mentioned an internal Operations Console endpoint:
+
+```text
+/rail-ops-console
+```
+
+This discovery provided a new direction for further investigation.
+
+## 5. API Discovery and Analysis
+
+One of the most challenging parts of this machine was discovering the internal API and understanding how the web application communicated with its backend.
+
+I initially attempted to use the password reset functionality with the staff email address, but this did not produce the expected result.
+
+I then investigated the application's network requests using the browser's Developer Tools.
+
+### Investigation Process
+
+1. Opened the browser's Developer Tools.
+2. Navigated to the Network tab.
+3. Inspected the resources and JavaScript files loaded by the application.
+4. Identified an interesting JavaScript bundle:
+
+```text
+staffing-DqMpIb9s.js
+```
+
+5. Inspected the JavaScript code and discovered an internal API request.
+6. Investigated the API response and found staff-related information, including an administrative email address.
+
+This information allowed me to continue the password reset process using the administrator's email address.
+
+**Key Learning:** JavaScript files delivered to the browser can reveal internal API endpoints, request structures, and information about how an application communicates with its backend.
+
+## 6. Administrative Access
+
+After discovering the administrator's email address through the API, I returned to the Mailpit interface.
+
+I used the administrator's email address in the password reset process and successfully obtained a password reset email.
+
+After setting a new password, I accessed the Operations Console.
+
+From the administrative interface, I explored the available sections and completed the remaining tasks.
+
+## 7. Challenge Results
+
+The challenge required completing four tasks:
+
+| Task | Result |
+|---|---|
+| Find the train's departure time | 23:45 |
+| Identify the guest who reserved the Nevermore mask | Desmond Marlow |
+| Find the guest's dining table number | T12HW |
+| Approve Oliver Reed's application and retrieve the invitation code | Completed |
+
+## 8. Tools and Techniques Used
+
+- **FFUF:** Directory and endpoint discovery.
+- **Browser Developer Tools:** Inspecting HTTP requests and responses.
+- **Network Tab:** Identifying loaded JavaScript resources.
+- **JavaScript Analysis:** Discovering internal API requests.
+- **Mailpit:** Inspecting internal emails and password reset messages.
+- **Web Enumeration:** Exploring application functionality and hidden resources.
+
+## 9. What I Learned
+
+1. How to perform directory enumeration using FFUF.
+2. How internal information can be exposed through email interfaces.
+3. How to inspect browser network traffic.
+4. How to investigate JavaScript bundles for API endpoints.
+5. How frontend applications communicate with backend APIs.
+6. How exposed API information can potentially lead to further access.
+7. How password reset functionality can become a security risk when account information is exposed.
+
+## 10. Challenges Faced
+
+The most difficult part of this challenge was discovering the internal API.
+
+I initially struggled to understand where the API endpoints were located and how to identify them within the application.
+
+I also needed additional guidance to understand how JavaScript files could reveal backend API requests and how the information returned by those requests could be used in the next steps.
+
+I followed video guidance during parts of the challenge, then reproduced the process and focused on understanding the techniques involved.
+
+## 11. Areas for Improvement
+
+- Improve my ability to discover API endpoints independently.
+- Practice analyzing JavaScript files.
+- Understand browser Network requests and API responses in more detail.
+- Learn how to identify sensitive information exposed through APIs.
+- Investigate authentication and password reset mechanisms.
+- Reduce dependency on walkthroughs and solve similar challenges independently.
+
+## 12. Conclusion & Self-Assessment
+
+I successfully completed the Black Train challenge.
+
+Although I struggled particularly with API discovery and needed video guidance during some stages, I gained practical experience with web enumeration, JavaScript analysis, and API investigation.
+
+**Next Goal:** Improve my API enumeration skills and solve similar web challenges without relying on walkthroughs.
