@@ -1,1 +1,178 @@
 
+# TryHackMe – Vulnversity
+
+## 1. Machine Information
+
+- **Platform:** TryHackMe
+- **Machine:** Vulnversity
+- **Category:** Linux / Web Security
+- **Difficulty:** Easy
+- **Date:** 28.11.2026
+- **Target IP:** [Target IP]
+- **Status:** Root Access Obtained
+
+## 2. Objective
+
+The objective of this machine was to identify running services on the target system, investigate a file upload mechanism in the web application, exploit a vulnerability in that mechanism to gain initial access, and finally escalate privileges to obtain root access.
+
+## 3. Initial Reconnaissance
+
+First, I used Nmap to identify open ports and running services on the target machine.
+
+Command:
+
+```bash
+nmap -sV <TARGET_IP>
+```
+
+The `-sV` parameter attempts to identify the versions of services running on open ports.
+
+The scan revealed the following services:
+
+| Port | Service |
+|---|---|
+| 21 | FTP |
+| 22 | SSH |
+| 139 | SMB |
+| 445 | SMB |
+| 3128 | Squid Proxy |
+| 3333 | HTTP / Apache |
+
+The Apache web server running on port 3333 caught my attention.
+
+## 4. Web Enumeration
+
+I accessed the web application running on port 3333 through my browser.
+
+To discover hidden directories on the web server, I used Gobuster.
+
+Command:
+
+```bash
+gobuster dir -u http://<TARGET_IP>:3333 -w /usr/share/wordlists/dirb/common.txt
+```
+
+The scan revealed several directories. One of the most interesting results was:
+
+```text
+/internal/
+```
+
+When I accessed this directory, I discovered a file upload interface.
+
+## 5. File Upload Vulnerability
+
+While investigating the file upload functionality, I noticed that the application rejected certain file extensions.
+
+I tested different file extensions to determine which file types were accepted by the application.
+
+Eventually, I discovered that files with the `.phtml` extension were accepted.
+
+This highlighted a potential security issue: relying only on file extensions for upload validation can be dangerous.
+
+On PHP-based servers, `.phtml` files may also be interpreted and executed as PHP code, depending on the server configuration.
+
+## 6. Initial Access
+
+To gain initial access, I used a PHP Reverse Shell.
+
+I prepared the reverse shell file and uploaded it using the accepted `.phtml` extension.
+
+Next, I started a Netcat listener to receive the incoming connection:
+
+```bash
+nc -lvnp <PORT>
+```
+
+I then triggered the uploaded file through the browser, causing the target system to initiate a connection back to my machine.
+
+As a result, I successfully obtained a reverse shell on the target system.
+
+## 7. User Access and First Flag
+
+After gaining initial access, I started investigating the system's users and directories.
+
+I inspected the `/home` directory to identify the available user accounts.
+
+```bash
+ls -la /home/
+```
+
+I located the user flag file in the relevant user's directory.
+
+## 8. Privilege Escalation
+
+At this stage, I did not have root privileges. Therefore, I started investigating possible privilege escalation techniques.
+
+On Linux systems, files with SUID permissions are important to investigate because they may introduce privilege escalation opportunities.
+
+To enumerate SUID binaries, I used:
+
+```bash
+find / -perm -4000 2>/dev/null
+```
+
+One of the interesting results was:
+
+```text
+/bin/systemctl
+```
+
+The SUID permissions on this binary, combined with its functionality, provided a potential opportunity for privilege escalation.
+
+I investigated the `systemctl` privilege escalation technique using GTFOBins.
+
+By using an appropriate service configuration, I was able to execute commands with root privileges and obtain root access.
+
+Finally, I accessed the root flag file located in the `/root` directory.
+
+## 9. Tools and Techniques Used
+
+| Tool | Purpose |
+|---|---|
+| Nmap | Port and service enumeration |
+| Gobuster | Directory discovery |
+| Browser | Web application inspection |
+| Netcat | Listening for reverse shell connections |
+| PHP Reverse Shell | Gaining initial access |
+| GTFOBins | Researching SUID and systemctl privilege escalation |
+
+## 10. What I Learned
+
+1. Improved my understanding of port and service enumeration using Nmap.
+2. Learned how to discover hidden web directories using Gobuster.
+3. Understood how file upload mechanisms can introduce security vulnerabilities.
+4. Learned why file extension validation alone is insufficient.
+5. Gained practical experience with PHP reverse shells.
+6. Practiced receiving reverse shell connections using Netcat.
+7. Improved my understanding of SUID permissions on Linux systems.
+8. Learned how Linux binaries can potentially be abused for privilege escalation using GTFOBins.
+9. Better understood the difference between initial access and obtaining root privileges.
+
+## 11. Challenges Faced
+
+- Identifying and interpreting open ports and running services.
+- Discovering hidden web directories.
+- Determining which file extensions were accepted by the upload mechanism.
+- Understanding how to establish a reverse shell connection.
+- Identifying and interpreting SUID permissions.
+- Understanding the privilege escalation technique involving systemctl.
+
+## 12. Areas for Improvement
+
+- Improve my web enumeration skills.
+- Study File Upload Vulnerabilities in more detail.
+- Strengthen my understanding of reverse shells and connection mechanisms.
+- Practice Linux file permissions and SUID concepts.
+- Explore additional privilege escalation techniques through GTFOBins.
+- Attempt to solve similar machines without relying on walkthroughs.
+
+## 13. Conclusion & Self-Assessment
+
+I successfully completed the Vulnversity machine.
+
+This machine provided practical experience with web enumeration, file upload vulnerabilities, reverse shells, and Linux privilege escalation.
+
+One of the most important things I learned was that gaining initial access does not necessarily mean having full control over a system. Additional investigation is often required to obtain root privileges.
+
+**Next Goal:** Improve my ability to independently achieve both initial access and privilege escalation on similar Linux machines.
