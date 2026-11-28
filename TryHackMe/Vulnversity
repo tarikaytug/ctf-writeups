@@ -8,7 +8,7 @@
 - **Category:** Linux / Web Security
 - **Difficulty:** Easy
 - **Date:** 28.11.2026
-- **Target IP:** [Target IP]
+- **Target IP:** 10.122.92.130
 - **Status:** Root Access Obtained
 
 ## 2. Objective
@@ -22,7 +22,7 @@ First, I used Nmap to identify open ports and running services on the target mac
 Command:
 
 ```bash
-nmap -sV <TARGET_IP>
+nmap -sV 10.122.92.130
 ```
 
 The `-sV` parameter attempts to identify the versions of services running on open ports.
@@ -49,7 +49,7 @@ To discover hidden directories on the web server, I used Gobuster.
 Command:
 
 ```bash
-gobuster dir -u http://<TARGET_IP>:3333 -w /usr/share/wordlists/dirb/common.txt
+gobuster dir -u http://10.122.92.130:3333 -w /usr/share/wordlists/dirb/common.txt
 ```
 
 The scan revealed several directories. One of the most interesting results was:
